@@ -8,18 +8,45 @@ import {
 
 
 var myMap;
+var coords = []
+var highlightedMarker = null
+
 
 export class ClockCtrl extends MetricsPanelCtrl {
   constructor($scope, $injector) {
     super($scope, $injector);
     this.panel.maxDataPoints = 250;
+    const dashboard = this.dashboard
+
+    $scope.$root.onAppEvent('setCrosshair', function(event, info) {
+      if(coords) {
+        for(var i = 0; i < coords.length; i++) {
+          if(coords[i].timestamp >= info.pos.x) {
+            if(coords[i].circle) {
+              coords[i].circle.setStyle({
+                fillColor: "red",
+                color: "red"
+              })
+            }
+            if(highlightedMarker) {
+              highlightedMarker.setStyle({
+                fillColor: "none",
+                color: "none"
+              })
+            }
+            highlightedMarker = coords[i].circle
+            break
+          }
+        }
+      }
+    })
 
 
     this.events.on('init-edit-mode', this.onInitEditMode.bind(this));
     this.events.on('panel-teardown', this.onPanelTeardown.bind(this));
     this.events.on('panel-initialized', this.render.bind(this));
     this.events.on('data-received', function(data) {
-      var coords = []
+      coords = []
       var minLat = 90
       var maxLat = -90
       var minLon = 180
@@ -46,7 +73,8 @@ export class ClockCtrl extends MetricsPanelCtrl {
         coords.push({
           value: data[0].datapoints[i][0],
           hash: data[1].datapoints[i][0],
-          position: position
+          position: position,
+          timestamp: data[0].datapoints[i][1]
         })
       }
       if(lastLineHasData) {
@@ -71,27 +99,28 @@ export class ClockCtrl extends MetricsPanelCtrl {
         maxZoom: 17
       });
       OpenTopoMap.addTo(myMap)
-      var OpenSeaMap = L.tileLayer('http://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
-      });
+      var OpenSeaMap = L.tileLayer('http://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {});
 
       OpenSeaMap.addTo(myMap)
       polylines.forEach(polyline => {
-          L.polyline(polyline, {
-            color: 'blue',
-            weight: 6,
-            opacity: 0.9
-          }).addTo(myMap)
-        })
-        // coords.forEach(point => {
-        //   if(point.position) {
-        //     L.circle(point.position, {
-        //       color: 'red',
-        //       fillColor: '#f03',
-        //       fillOpacity: 0.5,
-        //       radius: 10
-        //     }).addTo(myMap)
-        //   }
-        // })
+        L.polyline(polyline, {
+          color: 'blue',
+          weight: 6,
+          opacity: 0.9
+        }).addTo(myMap)
+      })
+      coords.forEach(point => {
+        if(point.position) {
+          point.circle = L.circleMarker(point.position, {
+            color: 'none',
+            stroke: 'false',
+            fillColor: 'none',
+            fillOpacity: 0.5,
+            radius: 10
+          })
+          point.circle.addTo(myMap)
+        }
+      })
     });
 
   }
