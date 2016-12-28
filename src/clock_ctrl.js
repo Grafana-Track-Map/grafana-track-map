@@ -58,9 +58,9 @@ export class ClockCtrl extends MetricsPanelCtrl {
         const position = data[1].datapoints[i][0] ? Geohash.decode(data[1].datapoints[i][0]) : null
         if(position) {
           minLat = Math.min(minLat, position.lat)
-          minLon = Math.min(minLon, position.lon)
+          minLon = Math.min(minLon, position.lng)
           maxLat = Math.max(maxLat, position.lat)
-          maxLon = Math.max(maxLon, position.lon)
+          maxLon = Math.max(maxLon, position.lng)
           polyline.push(position)
           lastLineHasData = true
         } else {
@@ -163,9 +163,9 @@ Geohash.decode = function(geohash) {
   // now just determine the centre of the cell...
 
   var latMin = bounds.sw.lat,
-    lonMin = bounds.sw.lon;
+    lonMin = bounds.sw.lng;
   var latMax = bounds.ne.lat,
-    lonMax = bounds.ne.lon;
+    lonMax = bounds.ne.lng;
 
   // cell centre
   var lat = (latMin + latMax) / 2;
@@ -177,7 +177,7 @@ Geohash.decode = function(geohash) {
 
   return {
     lat: Number(lat),
-    lon: Number(lon)
+    lng: Number(lon)
   };
 };
 
@@ -223,11 +223,11 @@ Geohash.bounds = function(geohash) {
   var bounds = {
     sw: {
       lat: latMin,
-      lon: lonMin
+      lng: lonMin
     },
     ne: {
       lat: latMax,
-      lon: lonMax
+      lng: lonMax
     },
   };
 
