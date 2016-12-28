@@ -1,5 +1,6 @@
 import LL from './leaflet.js'
 import _ from 'lodash';
+import moment from 'moment';
 import './css/clock-panel.css!';
 import './leaflet.css!';
 import {
@@ -10,12 +11,14 @@ import {
 var myMap;
 var coords = []
 var highlightedMarker = null
+var timeSrv
 
 
 export class ClockCtrl extends MetricsPanelCtrl {
   constructor($scope, $injector) {
     super($scope, $injector);
-    this.panel.maxDataPoints = 250;
+    timeSrv = $injector.get('timeSrv')
+    this.panel.maxDataPoints = 500;
     const dashboard = this.dashboard
 
     $scope.$root.onAppEvent('setCrosshair', function(event, info) {
@@ -93,6 +96,21 @@ export class ClockCtrl extends MetricsPanelCtrl {
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
         subdomains: 'abcd',
         maxZoom: 19
+      })
+
+      myMap.on("boxzoomend", function(e) {
+        const coordsInBox = coords.filter(coord =>
+          coord.position && e.boxZoomBounds.contains(L.latLng(coord.position.lat, coord.position.lng)))
+        const minTime = Math.min.apply(Math, coordsInBox.map(coord => coord.timestamp))
+        const maxTime = Math.max.apply(Math, coordsInBox.map(coord => coord.timestamp))
+        console.log(new Date(minTime))
+        console.log(new Date(maxTime))
+        if (isFinite(minTime)  && isFinite(maxTime)) {
+          timeSrv.setTime({
+            from  : moment.utc(minTime),
+            to    : moment.utc(maxTime),
+          })
+        }
       })
 
       var OpenTopoMap = L.tileLayer('http://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
