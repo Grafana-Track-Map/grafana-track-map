@@ -13,11 +13,11 @@
       {"name": "Project site", "url": "https://github.com/tkurki/grafana-track-map"},
       {"name": "MIT License", "url": "https://github.com/tkurki/grafana-track-map/blob/master/LICENSE"}
     ],
-    "version": "0.0.1"
+    "version": "0.1.1"
   },
 
   "dependencies": {
-    "grafanaVersion": "3.x.x",
+    "grafanaVersion": "4.x.x",
     "plugins": [ ]
   }
 }
