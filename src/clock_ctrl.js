@@ -6,7 +6,7 @@ import './leaflet.css!';
 import {
   MetricsPanelCtrl
 } from 'app/plugins/sdk';
-
+import appEvents from 'app/core/app_events';
 
 var myMap;
 var coords = []
@@ -21,10 +21,10 @@ export class ClockCtrl extends MetricsPanelCtrl {
     this.panel.maxDataPoints = 500;
     const dashboard = this.dashboard
 
-    $scope.$root.onAppEvent('setCrosshair', function(event, info) {
+    appEvents.on('graph-hover', (event) => {
       if(coords) {
         for(var i = 0; i < coords.length; i++) {
-          if(coords[i].timestamp >= info.pos.x) {
+          if(coords[i].timestamp >= event.pos.x) {
             if(coords[i].circle) {
               coords[i].circle.setStyle({
                 fillColor: "red",
@@ -42,7 +42,7 @@ export class ClockCtrl extends MetricsPanelCtrl {
           }
         }
       }
-    })
+    });
 
 
     this.events.on('init-edit-mode', this.onInitEditMode.bind(this));
