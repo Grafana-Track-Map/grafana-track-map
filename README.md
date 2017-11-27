@@ -1,3 +1,8 @@
+# CONSIDER THIS PROJECT ABANDONED
+
+Feel free to fork and assume ownership and add a PR to update this information.
+
+
 # grafana-track-map
 (Gps) track map visualisation plugin
 
